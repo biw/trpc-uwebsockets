@@ -9,7 +9,7 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom", "dom.iterable"],
     "typeRoots": ["node_modules/@types"],
     "types": ["node"],
     "strict": true,

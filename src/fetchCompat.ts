@@ -118,7 +118,6 @@ export async function uWsToRequest(
         },
       });
     }
-    init.duplex = 'half';
   }
 
   const request = new Request(url, init);
