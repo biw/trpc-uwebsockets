@@ -290,7 +290,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
         // send the value as data if the method is not a subscription
         respond(client, {
           id,
-          jsonrpc,
+          ...(jsonrpc ? { jsonrpc } : {}),
           result: {
             type: 'data',
             data: result,
@@ -355,7 +355,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
             opts.onError?.({ error, path, type, ctx, req, input });
             respond(client, {
               id,
-              jsonrpc,
+              ...(jsonrpc ? { jsonrpc } : {}),
               error: getErrorShape({
                 config: router._def._config,
                 error,
@@ -387,7 +387,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
 
           respond(client, {
             id,
-            jsonrpc,
+            ...(jsonrpc ? { jsonrpc } : {}),
             result,
           });
 
@@ -398,7 +398,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
 
         respond(client, {
           id,
-          jsonrpc,
+          ...(jsonrpc ? { jsonrpc } : {}),
           result: {
             type: 'stopped',
           },
@@ -409,7 +409,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
         opts.onError?.({ error, path, type, ctx, req, input });
         respond(client, {
           id,
-          jsonrpc,
+          ...(jsonrpc ? { jsonrpc } : {}),
           error: getErrorShape({
             config: router._def._config,
             error,
@@ -425,7 +425,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
 
       respond(client, {
         id,
-        jsonrpc,
+        ...(jsonrpc ? { jsonrpc } : {}),
         result: {
           type: 'started',
         },
@@ -436,7 +436,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
       opts.onError?.({ error, path, type, ctx, req, input });
       respond(client, {
         id,
-        jsonrpc,
+        ...(jsonrpc ? { jsonrpc } : {}),
         error: getErrorShape({
           config: router._def._config,
           error,
@@ -449,6 +449,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
     }
   }
 
+  // @ts-expect-error - uWsBehaviorOptions is not typed with exactOptionalPropertyTypes
   return {
     sendPingsAutomatically: opts.uWsBehaviorOptions?.sendPingsAutomatically, // could this be enabled?
     closeOnBackpressureLimit: opts.uWsBehaviorOptions?.closeOnBackpressureLimit,
