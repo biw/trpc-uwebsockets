@@ -117,6 +117,7 @@ export async function uWsToRequest(
           res.close();
         },
       });
+      init.duplex = 'half';
     }
   }
 
