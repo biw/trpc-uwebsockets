@@ -37,6 +37,7 @@ const getPostBody = (res: HttpResponse, maxBodySize: number | null) => {
           ok: false,
           error: new TRPCError({ code: 'PAYLOAD_TOO_LARGE' }),
         });
+        return;
       }
 
       //resolve if there is only one chunk
@@ -54,7 +55,9 @@ const getPostBody = (res: HttpResponse, maxBodySize: number | null) => {
       if (buffer) {
         //else accumulate
         buffer = Buffer.concat([buffer, chunk]);
-      } else buffer = Buffer.concat([chunk]);
+      } else {
+        buffer = Buffer.concat([chunk]);
+      }
 
       if (isLast) {
         resolve({
@@ -109,7 +112,15 @@ export async function uWsToRequest(
     if (parsedBody.ok) {
       init.body = parsedBody.data;
     } else {
-      init.body = Buffer.from(JSON.stringify(parsedBody.error));
+      init.body = new ReadableStream({
+        start(controller) {
+          controller.error(parsedBody.error);
+        },
+        cancel() {
+          res.close();
+        },
+      });
+      init.duplex = 'half';
     }
   }
 
