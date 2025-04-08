@@ -8,6 +8,7 @@ export {
   CreateContextOptions,
   CreateHandlerOptions,
   HandlerOptions,
+  uWsRequestHandler,
 } from './requestHandler';
 export {
   applyWebsocketHandler,
