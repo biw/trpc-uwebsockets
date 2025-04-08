@@ -2,6 +2,7 @@ export {
   HttpResponseDecorated,
   decorateHttpResponse,
   uWsToRequest,
+  uWsSendResponseStreamed,
 } from './fetchCompat';
 export {
   applyRequestHandler,
