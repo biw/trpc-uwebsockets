@@ -120,7 +120,7 @@ export function createURL(req: HttpRequest, protocol: string): URL {
   }
 }
 
-function createBody(
+export function createBody(
   res: HttpResponse,
   opts: {
     maxBodySize: number | null;

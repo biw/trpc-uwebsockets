@@ -3,6 +3,7 @@ export {
   decorateHttpResponse,
   uWsToRequest,
   uWsSendResponseStreamed,
+  createBody,
 } from './fetchCompat';
 export {
   applyRequestHandler,
