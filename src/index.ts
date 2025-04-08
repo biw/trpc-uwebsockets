@@ -1,4 +1,8 @@
-export { HttpResponseDecorated } from './fetchCompat';
+export {
+  HttpResponseDecorated,
+  decorateHttpResponse,
+  uWsToRequest,
+} from './fetchCompat';
 export {
   applyRequestHandler,
   CreateContextOptions,
