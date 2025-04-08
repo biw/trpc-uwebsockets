@@ -109,15 +109,7 @@ export async function uWsToRequest(
     if (parsedBody.ok) {
       init.body = parsedBody.data;
     } else {
-      init.body = new ReadableStream({
-        start(controller) {
-          controller.error(parsedBody.error);
-        },
-        cancel() {
-          res.close();
-        },
-      });
-      init.duplex = 'half';
+      init.body = Buffer.from(JSON.stringify(parsedBody.error));
     }
   }
 
