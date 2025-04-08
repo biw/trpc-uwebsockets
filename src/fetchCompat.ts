@@ -73,7 +73,7 @@ export function uWsToRequest(
   };
 
   if (method !== 'GET' && method !== 'HEAD') {
-    init.body = createBody(res, opts);
+    init.body = createBody(res, opts) || null;
     init.duplex = 'half';
   }
 

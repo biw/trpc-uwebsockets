@@ -11,6 +11,7 @@
     "outDir": "dist",
     "lib": ["esnext"],
     "typeRoots": ["node_modules/@types"],
+    "exactOptionalPropertyTypes": true,
     "types": ["node"],
     "strict": true,
     "strictNullChecks": true,
