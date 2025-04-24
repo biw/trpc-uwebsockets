@@ -58,16 +58,17 @@ type RemoveFunctions<T> = {
  */
 export type WebSocketBehaviorOptions = RemoveFunctions<WebSocketBehavior<any>>;
 
-// copying over packages/server/src/adapters/ws.ts
-
 export type WebSocketConnection = WebSocket<WebsocketData>;
+
+// following packages/server/src/adapters/ws.ts
 
 /**
  * @public
  */
 export type CreateWSSContextFnOptions = NodeHTTPCreateContextFnOptions<
   Request,
-  HttpResponseDecorated // res is never used here
+  HttpResponseDecorated
+  // WebSocketConnection
 > & {
   client: WebSocketConnection;
 };
@@ -82,6 +83,24 @@ export type WSConnectionHandlerOptions<TRouter extends AnyRouter> =
       inferRouterContext<TRouter>,
       CreateWSSContextFn<TRouter>
     >;
+
+export type WebsocketsKeepAlive = {
+  /**
+   * Enable heartbeat messages
+   * @default false
+   */
+  enabled: boolean;
+  /**
+   * Heartbeat interval in milliseconds
+   * @default 30_000
+   */
+  pingMs?: number | undefined;
+  /**
+   * Terminate the WebSocket if no pong is received after this many milliseconds
+   * @default 5_000
+   */
+  pongWaitMs?: number | undefined;
+};
 
 /**
  * WebSockets handler definition
@@ -98,25 +117,7 @@ export type WebsocketsHandlerOptions<TRouter extends AnyRouter> =
      * @default false
      */
     ssl?: boolean | undefined;
-    keepAlive?:
-      | {
-          /**
-           * Enable heartbeat messages
-           * @default false
-           */
-          enabled: boolean;
-          /**
-           * Heartbeat interval in milliseconds
-           * @default 30_000
-           */
-          pingMs?: number | undefined;
-          /**
-           * Terminate the WebSocket if no pong is received after this many milliseconds
-           * @default 5_000
-           */
-          pongWaitMs?: number | undefined;
-        }
-      | undefined;
+    keepAlive?: WebsocketsKeepAlive | undefined;
     /**
      * Disable responding to ping messages from the client
      * **Not recommended** - this is mainly used for testing
@@ -504,13 +505,13 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
         data.ctxCompleter = createCompleter();
 
         const useConnectionParams =
-          new URL(data.req.url).searchParams.get('connectionParams') === '1';
+          data.url.searchParams.get('connectionParams') === '1';
 
         try {
           data.ctx = await createContext?.({
             req: data.req,
-            // @ts-expect-error needed for type compatibility
-            res: undefined,
+            res: client as unknown as HttpResponseDecorated,
+            client: client,
             info: {
               connectionParams: useConnectionParams
                 ? getConnectionParams(msgStr)
@@ -520,7 +521,7 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
               accept: null,
               type: 'unknown',
               signal: data.abortController.signal,
-              url: null,
+              url: data.url,
             },
           });
           data.ctxCompleter.resolve();
@@ -545,16 +546,12 @@ export function getWSConnectionHandler<TRouter extends AnyRouter>(
               ctx: data.ctx,
             }),
           });
-
           data.ctxCompleter.reject(error);
+
           // close in next tick
           (globalThis.setImmediate ?? globalThis.setTimeout)(() => {
             client.end(1008);
           });
-
-          // setTimeout(() => {
-          //   client.end(1008);
-          // }, 1000);
         }
 
         if (useConnectionParams) {
