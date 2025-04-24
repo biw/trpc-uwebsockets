@@ -23,7 +23,7 @@
     "prepublish": "yarn clean && yarn prettier && yarn lint && yarn test",
     "clean": "rimraf -rf ./dist && rimraf -rf ./types && rimraf -rf ./coverage && rimraf -rf ./package.tgz",
     "format": "yarn clean && yarn prettier && yarn lint",
-    "lint": "eslint src/**/*.ts --fix",
+    "lint": "tsc && eslint src/**/*.ts --fix",
     "lint:dry": "eslint src/**/*.ts",
     "prettier": "prettier src/**/*.ts --config .prettierrc --write",
     "prettier:dry": "prettier src/**/*.ts --config .prettierrc"

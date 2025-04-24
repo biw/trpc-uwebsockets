@@ -209,6 +209,7 @@ function createClientBatchStream<TRouter extends AnyTRPCRouter>(
   const client = createTRPCClient<TRouter>({
     links: [
       linkSpy,
+      // @ts-expect-error due to exactOptionalPropertyTypes
       httpBatchStreamLink({
         url: `http://${host}`,
         headers: opts.headers,
@@ -231,6 +232,7 @@ function createClientBatch<TRouter extends AnyTRPCRouter>(
   const host = `localhost:${opts.port}${prefix}${qs}`;
   const client = createTRPCClient<TRouter>({
     links: [
+      // @ts-expect-error due to exactOptionalPropertyTypes
       httpBatchLink({
         url: `http://${host}`,
         headers: opts.headers,
@@ -256,6 +258,7 @@ function createClientSse<TRouter extends AnyTRPCRouter>(
   const client = createTRPCClient<TRouter>({
     links: [
       linkSpy,
+      // @ts-expect-error due to exactOptionalPropertyTypes
       httpSubscriptionLink({
         url: `http://${host}`,
         connectionParams: opts.wsClientOptions?.connectionParams,
