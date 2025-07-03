@@ -205,21 +205,25 @@ export async function uWsSendResponseStreamed(
       const { value, done } = await reader.read();
 
       if (res.aborted) {
+        reader.releaseLock();
         return;
       }
 
       if (done) {
+        if (res.aborted) return;
         res.cork(() => {
           res.end();
         });
         return;
       }
 
+      if (res.aborted) return;
       res.cork(() => {
         res.write(value);
       });
     }
   } else {
+    if (res.aborted) return;
     res.cork(() => {
       res.end();
     });
