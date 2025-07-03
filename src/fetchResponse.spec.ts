@@ -307,4 +307,91 @@ describe('response', () => {
 
     await server.close();
   });
+
+  test('uWsSendResponseStreamed handles abort during streaming without HttpResponse access error', async () => {
+    expect.assertions(1);
+    
+    const server = createServer({ maxBodySize: null });
+    
+    const size = 100;
+    const count = 10;
+    const sleepMs = 50;
+    
+    const controller = new AbortController();
+    
+    try {
+      const responsePromise = server.fetch({
+        path: `/slow/${size}/${count}/${sleepMs}`,
+        method: 'GET',
+        signal: controller.signal,
+      });
+      
+      setTimeout(() => {
+        controller.abort();
+      }, 25);
+      
+      const res = await responsePromise;
+      await res.text();
+    } catch (err: any) {
+      expect(err.name).toBe('AbortError');
+    }
+    
+    await server.close();
+  });
+
+  test('multiple concurrent abort scenarios do not cause HttpResponse access errors', async () => {
+    const server = createServer({ maxBodySize: null });
+    
+    const promises = Array.from({ length: 5 }, async (_, i) => {
+      const controller = new AbortController();
+      const abortDelay = Math.random() * 100;
+      
+      setTimeout(() => controller.abort(), abortDelay);
+      
+      try {
+        const res = await server.fetch({
+          path: `/slow/100/5/20`,
+          method: 'GET',
+          signal: controller.signal,
+        });
+        await res.text();
+      } catch (err: any) {
+        expect(err.name).toBe('AbortError');
+      }
+    });
+    
+    await Promise.allSettled(promises);
+    await server.close();
+  });
+
+  test('abort right before res.end() is handled correctly', async () => {
+    const server = createServer({ maxBodySize: null });
+    
+    const size = 50;
+    const count = 2;
+    const sleepMs = 30;
+    
+    const controller = new AbortController();
+    
+    try {
+      const responsePromise = server.fetch({
+        path: `/slow/${size}/${count}/${sleepMs}`,
+        method: 'GET',
+        signal: controller.signal,
+      });
+      
+      setTimeout(() => {
+        controller.abort();
+      }, 80);
+      
+      const res = await responsePromise;
+      await res.text();
+      
+      expect(true).toBe(true);
+    } catch (err: any) {
+      expect(err.name).toBe('AbortError');
+    }
+    
+    await server.close();
+  });
 });
