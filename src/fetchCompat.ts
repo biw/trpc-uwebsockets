@@ -153,6 +153,7 @@ function createBody(
       });
 
       res.onAborted(() => {
+        res.aborted = true;
         if (!hasClosed) {
           hasClosed = true;
           controller.error(new TRPCError({ code: 'CLIENT_CLOSED_REQUEST' }));
@@ -160,6 +161,7 @@ function createBody(
       });
     },
     cancel() {
+      if (res.aborted) return;
       res.cork(() => {
         res.close();
       });
