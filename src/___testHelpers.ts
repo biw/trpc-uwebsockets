@@ -17,6 +17,7 @@ import {
 import type {
   HTTPHeaders,
   TRPCLink,
+  TRPCWebSocketClient,
   WebSocketClientOptions,
 } from '@trpc/client';
 import {
@@ -177,7 +178,11 @@ function toQueryString(queryParams: Record<string, string>) {
 function createClientWs<TRouter extends AnyTRPCRouter>(
   router: TRouter,
   opts: ClientOptions
-) {
+): {
+  client: ReturnType<typeof createTRPCClient<TRouter>>;
+  wsClient: TRPCWebSocketClient;
+  orderedResults: number[];
+} {
   const prefix = opts.prefix ?? '/trpc';
   const transformer = router._def._config.transformer as any;
 
