@@ -15,14 +15,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest --coverage",
-    "test:publish": "yarn test && yarn build && yarn pack",
-    "bump-version": "node ./bumpVersion.js && yarn install && yarn test",
-    "publish:main": "yarn npm publish",
-    "publish:canary": "yarn npm publish --tag canary",
-    "prepack": "yarn build",
-    "prepublish": "yarn clean && yarn prettier && yarn lint && yarn test",
+    "test:publish": "pnpm test && pnpm build && pnpm pack",
+    "bump-version": "node ./bumpVersion.js && pnpm install && pnpm test",
+    "publish:main": "pnpm npm publish",
+    "publish:canary": "pnpm npm publish --tag canary",
+    "prepack": "pnpm build",
     "clean": "rimraf -rf ./dist && rimraf -rf ./types && rimraf -rf ./coverage && rimraf -rf ./package.tgz",
-    "format": "yarn clean && yarn prettier && yarn lint",
+    "format": "pnpm clean && pnpm prettier && pnpm lint",
     "lint": "eslint src/**/*.ts --fix",
     "lint:dry": "eslint src/**/*.ts",
     "prettier": "prettier src/**/*.ts --config .prettierrc --write",
@@ -77,6 +76,5 @@
     "type": "git",
     "url": "https://github.com/romanzy313/trpc-uwebsockets.git"
   },
-  "author": "Roman Volovoy",
-  "packageManager": "yarn@4.8.1"
+  "author": "Roman Volovoy"
 }
